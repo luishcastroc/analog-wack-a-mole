@@ -1,20 +1,12 @@
-import {
-  Component,
-  AfterViewInit,
-  OnDestroy,
-  ElementRef,
-  input,
-  effect,
-  untracked,
-  viewChild,
-} from "@angular/core";
-import { interval, Subscription } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import {AfterViewInit, Component, effect, ElementRef, input, OnDestroy, untracked, viewChild,} from "@angular/core";
+import {interval, Subscription} from "rxjs";
+import {map, tap} from "rxjs/operators";
 
 @Component({
   selector: "game-animated-sprite",
   standalone: true,
-  template: ` <canvas #canvas></canvas> `,
+  template: `
+    <canvas #canvas></canvas> `,
 })
 export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   canvasRef = viewChild<ElementRef<HTMLCanvasElement>>("canvas");
@@ -34,6 +26,8 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   private height!: number;
   private subscription!: Subscription;
   private currentLoopIndex = 0;
+  private currentAnimationType!: string;
+  private frameSequence!: number[];
 
   valueEffect = effect(() => {
     const [w, h, imgSrc] = [
@@ -48,16 +42,18 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef()?.nativeElement;
-    this.ctx = canvas?.getContext("2d")!;
+    if (canvas) {
+      this.ctx = canvas.getContext("2d")!;
 
-    this.img.src = this.imgSrc();
-    this.img.onload = () => {
-      this.calculateDimensions();
-      const autoPlay = this.autoPlayAnimation();
-      if (autoPlay) {
-        this.play(autoPlay);
-      }
-    };
+      this.img.src = this.imgSrc();
+      this.img.onload = () => {
+        this.calculateDimensions();
+        const autoPlay = this.autoPlayAnimation();
+        if (autoPlay) {
+          this.play(autoPlay);
+        }
+      };
+    }
   }
 
   private calculateDimensions(): void {
@@ -77,13 +73,20 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
       this.subscription.unsubscribe();
     }
     this.currentLoopIndex = 0;
-    const frameSequence = this.animations()[animationType];
-    this.startAnimation(frameSequence, onFinish);
+    this.currentAnimationType = animationType;
+    this.frameSequence = this.animations()[animationType];
+    this.startAnimation(this.frameSequence, onFinish);
   }
 
   pause(): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
+    }
+  }
+
+  resume(): void {
+    if (this.currentAnimationType && this.frameSequence) {
+      this.startAnimation(this.frameSequence);
     }
   }
 
