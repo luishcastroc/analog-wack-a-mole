@@ -9,5 +9,10 @@
       "default"
     ],
     "sharedGlobals": []
+  },
+  "generators": {
+    "@nx/angular:component": {
+      "style": "scss"
+    }
   }
 }
