@@ -12,6 +12,7 @@ import { timer } from 'rxjs';
   standalone: true,
   imports: [AnimatedSpriteComponent],
   template: ` <game-animated-sprite
+    (click)="whack()"
     #mole
     [animations]="animations"
     [columns]="6"
