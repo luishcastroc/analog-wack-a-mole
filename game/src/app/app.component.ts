@@ -1,8 +1,8 @@
-import { Component } from "@angular/core";
-import { RouterOutlet } from "@angular/router";
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: "game-root",
+  selector: 'game-root',
   standalone: true,
   imports: [RouterOutlet],
   template: ` <router-outlet />`,

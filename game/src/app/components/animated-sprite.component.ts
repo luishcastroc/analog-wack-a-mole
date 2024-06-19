@@ -1,15 +1,23 @@
-import {AfterViewInit, Component, effect, ElementRef, input, OnDestroy, untracked, viewChild,} from "@angular/core";
-import {interval, Subscription} from "rxjs";
-import {map, tap} from "rxjs/operators";
+import {
+  AfterViewInit,
+  Component,
+  effect,
+  ElementRef,
+  input,
+  OnDestroy,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import { interval, Subscription } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
-  selector: "game-animated-sprite",
+  selector: 'game-animated-sprite',
   standalone: true,
-  template: `
-    <canvas #canvas></canvas> `,
+  template: ` <canvas #canvas></canvas> `,
 })
 export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
-  canvasRef = viewChild<ElementRef<HTMLCanvasElement>>("canvas");
+  canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   imgSrc = input.required<string>();
   rows = input.required<number>();
   columns = input.required<number>();
@@ -17,8 +25,7 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   loopMode = input(false);
   frameWidth = input<number | null>(null);
   frameHeight = input<number | null>(null);
-  fps = input(6);
-  autoPlayAnimation = input("");
+  autoPlayAnimation = input('');
 
   private img = new Image();
   private ctx!: CanvasRenderingContext2D;
@@ -43,7 +50,7 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     const canvas = this.canvasRef()?.nativeElement;
     if (canvas) {
-      this.ctx = canvas.getContext("2d")!;
+      this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
       this.img.src = this.imgSrc();
       this.img.onload = () => {
@@ -68,14 +75,14 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  play(animationType: string, onFinish?: () => void): void {
+  play(animationType: string, fps = 24, onFinish?: () => void): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
     this.currentLoopIndex = 0;
     this.currentAnimationType = animationType;
     this.frameSequence = this.animations()[animationType];
-    this.startAnimation(this.frameSequence, onFinish);
+    this.startAnimation(this.frameSequence, fps, onFinish);
   }
 
   pause(): void {
@@ -95,13 +102,17 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
     this.currentLoopIndex = 0;
   }
 
-  private startAnimation(frameSequence: number[], onFinish?: () => void): void {
-    const frameRate = 1000 / this.fps();
+  private startAnimation(
+    frameSequence: number[],
+    fps = 24,
+    onFinish?: () => void
+  ): void {
+    const frameRate = 1000 / fps;
     this.subscription = interval(frameRate)
       .pipe(
         tap(() => this.clearCanvas()),
         map(() => frameSequence[this.currentLoopIndex]),
-        tap((frameIndex) => this.drawFrame(frameIndex)),
+        tap(frameIndex => this.drawFrame(frameIndex)),
         tap(() => {
           this.currentLoopIndex++;
           if (this.currentLoopIndex >= frameSequence.length) {

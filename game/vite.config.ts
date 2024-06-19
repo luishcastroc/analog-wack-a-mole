@@ -1,8 +1,8 @@
 /// <reference types="vitest" />
 
-import analog from "@analogjs/platform";
-import { defineConfig, splitVendorChunkPlugin } from "vite";
-import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
+import analog from '@analogjs/platform';
+import { defineConfig, splitVendorChunkPlugin } from 'vite';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -11,25 +11,25 @@ export default defineConfig(({ mode }) => {
     cacheDir: `../node_modules/.vite`,
 
     build: {
-      outDir: "../dist/./game/client",
+      outDir: '../dist/./game/client',
       reportCompressedSize: true,
-      target: ["es2020"],
+      target: ['es2020'],
     },
     server: {
       fs: {
-        allow: ["."],
+        allow: ['.'],
       },
     },
     plugins: [analog(), nxViteTsPaths(), splitVendorChunkPlugin()],
     test: {
       globals: true,
-      environment: "jsdom",
-      setupFiles: ["src/test-setup.ts"],
-      include: ["**/*.spec.ts"],
-      reporters: ["default"],
+      environment: 'jsdom',
+      setupFiles: ['src/test-setup.ts'],
+      include: ['**/*.spec.ts'],
+      reporters: ['default'],
     },
     define: {
-      "import.meta.vitest": mode !== "production",
+      'import.meta.vitest': mode !== 'production',
     },
   };
 });

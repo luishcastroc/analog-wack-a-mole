@@ -1,9 +1,9 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 
-import { GameContainerComponent } from "./game-container.component";
+import { GameContainerComponent } from './game-container.component';
 
 @Component({
-  selector: "game-home",
+  selector: 'game-home',
   standalone: true,
   imports: [GameContainerComponent],
   template: ` <game-container /> `,

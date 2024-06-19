@@ -1,23 +1,26 @@
-import {Component, output, viewChild} from "@angular/core";
-import {AnimatedSpriteComponent} from "./animated-sprite.component";
-import {timer} from "rxjs";
+import { Component, output, viewChild } from '@angular/core';
+import { AnimatedSpriteComponent } from './animated-sprite.component';
+import { timer } from 'rxjs';
 
 @Component({
-  selector: "game-mole",
+  selector: 'game-mole',
   standalone: true,
   imports: [AnimatedSpriteComponent],
-  template: `<game-animated-sprite
+  template: ` <game-animated-sprite
     #mole
     [animations]="animations"
     [columns]="6"
     [rows]="8"
-    [imgSrc]="'/sprites.png'"
-    [autoPlayAnimation]="'idle'"
-  />`,
+    [imgSrc]="'/img/sprites.png'"
+    [autoPlayAnimation]="'idle'" />`,
 })
 export class MoleComponent {
-  mole = viewChild<AnimatedSpriteComponent>("mole");
-  finishPopping = output<number>({alias:'finishPopping'})
+  mole = viewChild<AnimatedSpriteComponent>('mole'); // Accesses the AnimatedSpriteComponent
+  finishPopping = output<number>({ alias: 'finishPopping' }); // Emits when popping is finished
+  damage = output({ alias: 'damageReceived' });
+  score = output({ alias: 'takeScore' });
+  heal = output({ alias: 'moleHealing' });
+
   animations = {
     idle: [0],
     appear: [1, 2, 3, 4],
@@ -27,27 +30,81 @@ export class MoleComponent {
     attack: [11, 12, 13, 14, 15, 16],
     heal: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
   };
-  isAppearing = false;
 
-  pop(i?:number) {
-    const mole = this.mole();
-    if (mole) {
-      this.isAppearing = true;
-      mole.play('appear', () => {
-        timer(1500).subscribe(() => {
-          this.hide();
+  isAppearing = false;
+  isFeisty = false;
+  isHealing = false;
+  isWhacked = false;
+  isAttacking = false;
+
+  pop(i: number) {
+    this.isWhacked = false;
+    this.isAttacking = false;
+    this.isAppearing = true;
+
+    this.isFeisty = Math.random() < 0.5;
+    if (!this.isFeisty) {
+      this.isHealing = Math.random() < 0.06;
+    }
+
+    if (this.isHealing) {
+      this.mole()?.play('heal', 24, () => {
+        timer(1000).subscribe({
+          next: () => {
+            this.mole()?.play('hide', 24, () => {
+              this.isAppearing = false;
+              this.finishPopping.emit(i);
+            });
+          },
         });
+      });
+    } else {
+      this.mole()?.play('appear', 24, () => {
+        if (this.isFeisty) {
+          timer(1000).subscribe({
+            next: () => {
+              this.isAttacking = true;
+              this.damage.emit();
+              this.mole()?.play('attack', 12, () => {
+                this.mole()?.play('hide', 24, () => {
+                  this.isAppearing = false;
+                  this.finishPopping.emit(i);
+                });
+              });
+            },
+          });
+        } else {
+          timer(1000).subscribe({
+            next: () => {
+              this.mole()?.play('hide', 24, () => {
+                this.isAppearing = false;
+                this.finishPopping.emit(i);
+              });
+            },
+          });
+        }
       });
     }
   }
 
-  hide(i?:number) {
-    const mole = this.mole();
-    if (mole) {
-      mole.play('hide', () => {
-        this.isAppearing = false;
-        this.finishPopping.emit(i as number)
-      });
+  whack(i: number) {
+    if (!this.isAppearing || this.isWhacked || this.isAttacking) {
+      return;
     }
+
+    this.isWhacked = true;
+    this.isFeisty = false;
+
+    this.score.emit();
+    if (this.isHealing) {
+      this.heal.emit();
+    }
+
+    this.mole()?.play('dizzy', 24, () => {
+      this.mole()?.play('faint', 24, () => {
+        this.isAppearing = false;
+        this.finishPopping.emit(i);
+      });
+    });
   }
 }
