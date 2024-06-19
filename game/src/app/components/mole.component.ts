@@ -1,4 +1,9 @@
-import { Component, output, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  output,
+  viewChild,
+} from '@angular/core';
 import { AnimatedSpriteComponent } from './animated-sprite.component';
 import { timer } from 'rxjs';
 
@@ -13,10 +18,11 @@ import { timer } from 'rxjs';
     [rows]="8"
     [imgSrc]="'/img/sprites.png'"
     [autoPlayAnimation]="'idle'" />`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoleComponent {
   mole = viewChild<AnimatedSpriteComponent>('mole'); // Accesses the AnimatedSpriteComponent
-  finishPopping = output<number>({ alias: 'finishPopping' }); // Emits when popping is finished
+  finishPopping = output({ alias: 'finishPopping' }); // Emits when popping is finished
   damage = output({ alias: 'damageReceived' });
   score = output({ alias: 'takeScore' });
   heal = output({ alias: 'moleHealing' });
@@ -37,7 +43,7 @@ export class MoleComponent {
   isWhacked = false;
   isAttacking = false;
 
-  pop(i: number) {
+  pop() {
     this.isWhacked = false;
     this.isAttacking = false;
     this.isAppearing = true;
@@ -53,7 +59,7 @@ export class MoleComponent {
           next: () => {
             this.mole()?.play('hide', 24, () => {
               this.isAppearing = false;
-              this.finishPopping.emit(i);
+              this.finishPopping.emit();
             });
           },
         });
@@ -68,7 +74,7 @@ export class MoleComponent {
               this.mole()?.play('attack', 12, () => {
                 this.mole()?.play('hide', 24, () => {
                   this.isAppearing = false;
-                  this.finishPopping.emit(i);
+                  this.finishPopping.emit();
                 });
               });
             },
@@ -78,7 +84,7 @@ export class MoleComponent {
             next: () => {
               this.mole()?.play('hide', 24, () => {
                 this.isAppearing = false;
-                this.finishPopping.emit(i);
+                this.finishPopping.emit();
               });
             },
           });
@@ -87,7 +93,7 @@ export class MoleComponent {
     }
   }
 
-  whack(i: number) {
+  whack() {
     if (!this.isAppearing || this.isWhacked || this.isAttacking) {
       return;
     }
@@ -103,7 +109,7 @@ export class MoleComponent {
     this.mole()?.play('dizzy', 24, () => {
       this.mole()?.play('faint', 24, () => {
         this.isAppearing = false;
-        this.finishPopping.emit(i);
+        this.finishPopping.emit();
       });
     });
   }

@@ -2,8 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  @font-face {
+    font-family: 'LilitaOne';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/LilitaOne-Regular.ttf') format('truetype');
+  }
+}
+
 html,
 body {
   display: block;
   height: 100%;
+  font-family: 'LilitaOne', sans-serif;
+}
+
+img {
+  max-width: none;
 }

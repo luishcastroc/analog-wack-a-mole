@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   effect,
   ElementRef,
@@ -15,6 +16,7 @@ import { map, tap } from 'rxjs/operators';
   selector: 'game-animated-sprite',
   standalone: true,
   template: ` <canvas #canvas></canvas> `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
@@ -76,9 +78,7 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   }
 
   play(animationType: string, fps = 24, onFinish?: () => void): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.clearSubscription();
     this.currentLoopIndex = 0;
     this.currentAnimationType = animationType;
     this.frameSequence = this.animations()[animationType];
@@ -86,9 +86,7 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   }
 
   pause(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.clearSubscription();
   }
 
   resume(): void {
@@ -153,9 +151,13 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  private clearSubscription(): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.clearSubscription();
   }
 }
