@@ -52,8 +52,8 @@ const DEFAULT_STATE: GameState = {
     GameOverComponent,
     PauseComponent,
   ],
-  template: `<div class="container flex flex-col items-center">
-    <div class="background-image">
+  template: `<div class="container flex h-[100dvh] flex-col items-center">
+    <div class="background-image flex w-full flex-1 flex-col md:w-[650px]">
       <div class="header">
         <div class="stats">
           <game-level [level]="state().level" />
@@ -66,7 +66,7 @@ const DEFAULT_STATE: GameState = {
         </div>
       </div>
       <div class="moles-container">
-        @for (mole of moles; track $index) {
+        @for (mole of moles(); track $index) {
           <game-mole
             #moleComponent
             (finishPopping)="onFinishPopping()"
@@ -102,10 +102,6 @@ const DEFAULT_STATE: GameState = {
 
     .background-image {
       background: url('/img/background.png');
-      width: 650px;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
     }
 
     .header {
@@ -138,7 +134,9 @@ const DEFAULT_STATE: GameState = {
       display: grid;
       gap: 1rem;
       padding: 0 1rem;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(143px, 1fr));
+      align-items: center;
+      justify-items: center;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -147,7 +145,8 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
   moleComponents = viewChildren<MoleComponent>('moleComponent');
   private moleIntervalSubscription!: Subscription;
   private timerIntervalSubscription!: Subscription;
-  moles = Array.from({ length: 12 });
+  moleQty = 12;
+  moles = signal<Array<number>>(Array.from({ length: this.moleQty }));
   molesPopping = 0;
   state = signal<GameState>({ ...DEFAULT_STATE });
 
@@ -195,11 +194,11 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
 
   popRandomMole(): void {
     const molesArray = this.moleComponents();
-    if (molesArray.length !== 12) {
+    if (molesArray.length !== this.moleQty) {
       return;
     }
 
-    const randomIndex = this.randomBetween(0, 11);
+    const randomIndex = this.randomBetween(0, this.moleQty - 1);
     const mole = molesArray[randomIndex];
     if (!mole.isAppearing && this.molesPopping < 3) {
       this.molesPopping += 1;
