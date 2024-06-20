@@ -28,6 +28,8 @@ interface GameState {
   paused: boolean;
   gameOver: boolean;
   health: number;
+  molesAllowed: number;
+  damage: number;
 }
 
 const DEFAULT_STATE: GameState = {
@@ -38,6 +40,8 @@ const DEFAULT_STATE: GameState = {
   paused: false,
   gameOver: false,
   health: 100,
+  molesAllowed: 3,
+  damage: 5,
 };
 
 @Component({
@@ -116,6 +120,7 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
   molesPopping = 0;
   state = signal<GameState>({ ...DEFAULT_STATE });
   #responsive = inject(BreakpointObserver);
+  private timeConditionMet = false;
 
   constructor() {
     this.#responsive.observe([Breakpoints.Handset]).subscribe({
@@ -125,8 +130,6 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
         } else {
           this.moleWidth.set(0);
         }
-
-        console.log({ result });
       },
     });
   }
@@ -181,9 +184,19 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
 
     const randomIndex = this.randomBetween(0, this.moleQty - 1);
     const mole = molesArray[randomIndex];
-    if (!mole.isAppearing && this.molesPopping < 3) {
+    if (!mole.isAppearing && this.molesPopping < this.state().molesAllowed) {
       this.molesPopping += 1;
       mole.pop();
+    }
+  }
+
+  popAllMoles(): void {
+    const molesArray = this.moleComponents();
+    for (let i = 0; i < this.state().molesAllowed; i++) {
+      if (this.molesPopping < 3) {
+        this.molesPopping += 1;
+        molesArray[i].pop();
+      }
     }
   }
 
@@ -197,11 +210,19 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
       }
     } else {
       this.state.update(state => ({ ...state, time: (state.time -= 1) }));
+
+      // Check if time is less than 30% of the full time and the condition has not been met
+      if (!this.timeConditionMet && this.state().time < 0.3 * DEFAULT_TIME) {
+        this.state.update(state => ({ ...state, molesAllowed: 4 }));
+        this.popAllMoles();
+        this.timeConditionMet = true;
+      }
     }
   }
 
   reset() {
     this.molesPopping = 0;
+    this.timeConditionMet = false;
     this.state.update(() => ({ ...DEFAULT_STATE }));
     this.setupTicks();
   }
@@ -219,13 +240,14 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
 
   nextLevel() {
     this.molesPopping = 0;
+    this.timeConditionMet = false;
     this.state.update(state => ({
       ...state,
       level: (state.level += 1),
       cleared: false,
       gameOver: false,
-      score: 0,
       time: DEFAULT_TIME,
+      molesAllowed: 3,
     }));
     this.setupTicks();
   }
@@ -240,7 +262,9 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
     }
 
     const targetHealth =
-      this.state().health - 10 < 0 ? 0 : this.state().health - 10;
+      this.state().health - this.state().damage < 0
+        ? 0
+        : this.state().health - this.state().damage;
 
     this.state.update(state => ({ ...state, health: targetHealth }));
 
@@ -251,6 +275,7 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
 
   gameOver() {
     this.clearIntervals();
+    this.timeConditionMet = false;
     this.state.update(state => ({ ...state, gameOver: true }));
   }
 

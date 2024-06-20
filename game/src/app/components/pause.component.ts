@@ -5,9 +5,9 @@ import { ChangeDetectionStrategy, Component, output } from '@angular/core';
   standalone: true,
   template: `<div class="clear-screen">
     <div class="panel">
-      <span class="panel-title">Ready?</span>
+      <span class="panel-title text-center">Game Paused, Ready?</span>
 
-      <div class="panel-buttons-container">
+      <div class="panel-buttons-container bottom-[20rem]">
         <div class="panel-button" (click)="reset.emit()">
           <img
             class="panel-button-icon"

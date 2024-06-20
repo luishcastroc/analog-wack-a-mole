@@ -53,7 +53,7 @@ export class MoleComponent {
     this.isAppearing = true;
 
     this.isFeisty = Math.random() < 0.5;
-    this.isHealing = !this.isFeisty && Math.random() < 0.06;
+    this.isHealing = !this.isFeisty && Math.random() < 0.08;
 
     if (this.isHealing) {
       this.mole()?.play('heal', 24, () => {
@@ -62,10 +62,10 @@ export class MoleComponent {
     } else {
       this.mole()?.play('appear', 24, () => {
         if (this.isFeisty && !this.isWhacked) {
-          timer(1000).subscribe(() => {
+          timer(600).subscribe(() => {
             if (!this.isWhacked) {
               this.isAttacking = true;
-              this.mole()?.play('attack', 12, () => {
+              this.mole()?.play('attack', 13, () => {
                 this.damage.emit();
                 this.hideMole();
               });
