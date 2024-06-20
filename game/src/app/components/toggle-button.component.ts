@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: ` <button type="button">
-    <img [src]="imgSource()" alt="Pause icon, two vertical white bars" />
+    <img [src]="imgSource" alt="Pause icon, two vertical white bars" />
   </button>`,
   styles: `
     button {
@@ -33,10 +28,5 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToggleButtonComponent {
-  buttonState = input.required<'paused' | 'playing'>();
-  imgSource = computed(() =>
-    this.buttonState() === 'paused'
-      ? '/img/icon_play.png'
-      : '/img/icon_pause.png'
-  );
+  imgSource = '/img/icon_pause.png';
 }

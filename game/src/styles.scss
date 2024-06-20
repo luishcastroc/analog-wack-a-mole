@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --max-width: 100%;
+  --max-height: 100dvh;
+  --xr: calc(100% / 650);
+  --yr: calc(100dvh / 1024);
+}
+
 @layer base {
   @font-face {
     font-family: 'LilitaOne';
@@ -20,4 +27,96 @@ body {
 
 img {
   max-width: none;
+}
+
+.clear-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--max-width);
+  height: var(--max-height);
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.cleared-level-container {
+  z-index: 3;
+  width: calc(var(--yr) * 250);
+  height: calc(var(--yr) * 250);
+  border-radius: calc(var(--yr) * 125);
+  background-color: #ff1a1a;
+  border-width: 5px;
+  border-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.cleared-level-text {
+  font-size: 45px;
+  color: white;
+}
+
+.panel {
+  background-color: #29aecc;
+  border-color: white;
+  border-width: 5px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: calc(var(--yr) * 400);
+  height: calc(var(--yr) * 300);
+  margin-top: calc(var(--yr) * -40);
+}
+
+.panel-title {
+  font-size: 45px;
+  color: black;
+  text-shadow: 1px 1px 2px white;
+}
+
+.panel-text {
+  font-size: 31px;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+  margin-bottom: calc(var(--yr) * 50);
+}
+
+.panel-buttons-container {
+  position: absolute;
+  height: calc(var(--yr)* 80);
+  bottom: calc(var(--yr)* 240);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(var(--yr)* 350);
+  flex-direction: row;
+}
+
+.panel-button {
+  width: calc(var(--yr) * 80);
+  height: calc(var(--yr) * 80);
+  border-radius: calc(var(--yr) * 40);
+  background-color: #ff1a1a;
+  border-width: 5px;
+  border-color: white;
+  margin-left: calc(var(--xr) * 15);
+  margin-right: calc(var(--xr) * 15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.panel-button-icon {
+  width: calc(var(--yr) * 35);
+  height: calc(var(--yr) * 35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

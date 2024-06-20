@@ -13,6 +13,9 @@ import { TimerComponent } from './timer.component';
 import { ScoreComponent } from './score.component';
 import { ToggleButtonComponent } from './toggle-button.component';
 import { HealthBarComponent } from './health-bar.component';
+import { ClearLevelComponent } from './clear-level.component';
+import { GameOverComponent } from './game-over.component';
+import { PauseComponent } from './pause.component';
 
 const DEFAULT_TIME = 30;
 interface GameState {
@@ -45,6 +48,9 @@ const DEFAULT_STATE: GameState = {
     ScoreComponent,
     ToggleButtonComponent,
     HealthBarComponent,
+    ClearLevelComponent,
+    GameOverComponent,
+    PauseComponent,
   ],
   template: `<div class="container flex flex-col items-center">
     <div class="background-image">
@@ -53,9 +59,7 @@ const DEFAULT_STATE: GameState = {
           <game-level [level]="state().level" />
           <game-timer [time]="state().time" />
           <game-score [score]="state().score" />
-          <game-toggle-button
-            (click)="state().paused ? resume() : pause()"
-            [buttonState]="state().paused ? 'paused' : 'playing'" />
+          <game-toggle-button (click)="state().paused ? resume() : pause()" />
         </div>
         <div class="health-container">
           <game-health-bar [health]="state().health" />
@@ -72,6 +76,22 @@ const DEFAULT_STATE: GameState = {
         }
       </div>
     </div>
+    @if (state().cleared) {
+      <game-clear-level
+        [score]="state().score"
+        [level]="state().level"
+        (nextLevel)="nextLevel()"
+        (reset)="reset()" />
+    }
+    @if (state().gameOver) {
+      <game-game-over
+        [score]="state().score"
+        [level]="state().level"
+        (reset)="reset()" />
+    }
+    @if (state().paused) {
+      <game-pause (reset)="reset()" (resume)="resume()" />
+    }
   </div>`,
   styles: `
     :host {
@@ -113,9 +133,12 @@ const DEFAULT_STATE: GameState = {
     }
 
     .moles-container {
+      cursor: url('/img/hammer.png'), auto;
+      position: relative;
       display: grid;
       gap: 1rem;
-      grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+      padding: 0 1rem;
+      grid-template-columns: repeat(3, 1fr);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -130,7 +153,6 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.setupTicks();
-    this.pause();
   }
 
   setupTicks() {
@@ -188,7 +210,11 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
   timerTick(): void {
     if (this.state().time === 0) {
       this.clearIntervals();
-      this.state.update(state => ({ ...state, cleared: true }));
+      if (this.state().score > 0) {
+        this.state.update(state => ({ ...state, cleared: true }));
+      } else {
+        this.gameOver();
+      }
     } else {
       this.state.update(state => ({ ...state, time: (state.time -= 1) }));
     }
@@ -197,6 +223,7 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
   reset() {
     this.molesPopping = 0;
     this.state.update(() => ({ ...DEFAULT_STATE }));
+    this.setupTicks();
   }
 
   pause() {
@@ -217,6 +244,7 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
       level: (state.level += 1),
       cleared: false,
       gameOver: false,
+      score: 0,
       time: DEFAULT_TIME,
     }));
     this.setupTicks();

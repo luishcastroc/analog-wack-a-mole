@@ -43,69 +43,45 @@ export class MoleComponent {
   isHealing = false;
   isWhacked = false;
   isAttacking = false;
+  isHiding = false;
 
   pop() {
-    this.isWhacked = false;
-    this.isAttacking = false;
+    this.resetStates();
     this.isAppearing = true;
 
     this.isFeisty = Math.random() < 0.5;
-    if (!this.isFeisty) {
-      this.isHealing = Math.random() < 0.06;
-    }
+    this.isHealing = !this.isFeisty && Math.random() < 0.06;
 
     if (this.isHealing) {
       this.mole()?.play('heal', 24, () => {
-        timer(1000).subscribe({
-          next: () => {
-            this.mole()?.play('hide', 24, () => {
-              this.isAppearing = false;
-              this.finishPopping.emit();
-            });
-          },
-        });
+        timer(1000).subscribe(() => this.hideMole());
       });
     } else {
       this.mole()?.play('appear', 24, () => {
-        if (this.isFeisty) {
-          timer(1000).subscribe({
-            next: () => {
+        if (this.isFeisty && !this.isWhacked) {
+          timer(1000).subscribe(() => {
+            if (!this.isWhacked) {
               this.isAttacking = true;
-              this.damage.emit();
               this.mole()?.play('attack', 12, () => {
-                this.mole()?.play('hide', 24, () => {
-                  this.isAppearing = false;
-                  this.finishPopping.emit();
-                });
+                this.damage.emit();
+                this.hideMole();
               });
-            },
+            }
           });
         } else {
-          timer(1000).subscribe({
-            next: () => {
-              this.mole()?.play('hide', 24, () => {
-                this.isAppearing = false;
-                this.finishPopping.emit();
-              });
-            },
-          });
+          timer(1000).subscribe(() => this.hideMole());
         }
       });
     }
   }
 
   whack() {
-    if (!this.isAppearing || this.isWhacked || this.isAttacking) {
-      return;
-    }
+    if (!this.isAppearing || this.isWhacked || this.isAttacking) return;
 
     this.isWhacked = true;
     this.isFeisty = false;
-
     this.score.emit();
-    if (this.isHealing) {
-      this.heal.emit();
-    }
+    if (this.isHealing) this.heal.emit();
 
     this.mole()?.play('dizzy', 24, () => {
       this.mole()?.play('faint', 24, () => {
@@ -113,5 +89,21 @@ export class MoleComponent {
         this.finishPopping.emit();
       });
     });
+  }
+
+  hideMole() {
+    if (this.isHiding) return;
+    this.isHiding = true;
+    this.mole()?.play('hide', 24, () => {
+      this.isAppearing = false;
+      this.finishPopping.emit();
+    });
+  }
+
+  resetStates() {
+    this.isWhacked = false;
+    this.isAttacking = false;
+    this.isHiding = false;
+    this.isHealing = false;
   }
 }

@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
-
-import { GameContainerComponent } from '../components/game-container.component';
+import { WelcomeComponent } from '../components/welcome.component';
 
 @Component({
-  selector: 'game-home',
   standalone: true,
-  imports: [GameContainerComponent],
-  template: ` <game-container /> `,
+  imports: [WelcomeComponent],
+  template: ` <game-welcome /> `,
 })
-export default class HomeComponent {}
+export default class GameComponent {}
