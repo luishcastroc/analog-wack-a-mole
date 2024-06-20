@@ -70,7 +70,7 @@ const DEFAULT_STATE: GameState = {
         </div>
       </div>
       <div
-        class="relative grid cursor-[url('/img/hammer.png'),_auto] grid-cols-[repeat(3,_minmax(140px,_1fr))] items-center justify-items-center gap-4 px-4 py-0">
+        class="relative grid cursor-[url('/img/hammer.png'),_auto] grid-cols-[repeat(3,_minmax(110px,_1fr))] items-center justify-items-center gap-4 px-4 py-0 md:grid-cols-[repeat(3,_minmax(140px,_1fr))]">
         @for (mole of moles(); track $index) {
           <game-mole
             #moleComponent
@@ -121,7 +121,7 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
     this.#responsive.observe([Breakpoints.Handset]).subscribe({
       next: result => {
         if (result.matches) {
-          this.moleWidth.set(110);
+          this.moleWidth.set(100);
         } else {
           this.moleWidth.set(0);
         }
