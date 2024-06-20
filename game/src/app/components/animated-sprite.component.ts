@@ -152,16 +152,22 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   }
 
   private drawFrame(frameIndex: number): void {
-    const frameX = frameIndex % this.columns();
+    const frameX = Math.floor(frameIndex % this.columns());
     const frameY = Math.floor(frameIndex / this.columns());
-    const naturalFrameWidth = this.img.naturalWidth / this.columns();
-    const naturalFrameHeight = this.img.naturalHeight / this.rows();
+    const naturalFrameWidth = Math.floor(
+      this.img.naturalWidth / this.columns()
+    );
+    const naturalFrameHeight = Math.floor(this.img.naturalHeight / this.rows());
+
+    // Add a small padding (1px) to avoid black lines
+    const padding = 1;
+
     this.ctx.drawImage(
       this.img,
-      frameX * naturalFrameWidth,
-      frameY * naturalFrameHeight,
-      naturalFrameWidth,
-      naturalFrameHeight,
+      frameX * naturalFrameWidth + padding,
+      frameY * naturalFrameHeight + padding,
+      naturalFrameWidth - padding * 2,
+      naturalFrameHeight - padding * 2,
       0,
       0,
       this.width,
