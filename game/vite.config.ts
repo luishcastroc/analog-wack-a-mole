@@ -9,7 +9,6 @@ export default defineConfig(({ mode }) => {
   return {
     root: __dirname,
     cacheDir: `../node_modules/.vite`,
-
     build: {
       outDir: '../dist/./game/client',
       reportCompressedSize: true,
@@ -21,7 +20,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
-      analog({ ssr: false }),
+      analog({
+        ssr: false,
+        nitro: {
+          preset: 'vercel',
+          serveStatic: false,
+          externals: { inline: ['zone.js/node', 'tslib'] },
+        },
+      }),
       nxViteTsPaths(),
       splitVendorChunkPlugin(),
     ],
