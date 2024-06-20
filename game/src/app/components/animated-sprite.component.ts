@@ -15,7 +15,7 @@ import { map, tap } from 'rxjs/operators';
 @Component({
   selector: 'game-animated-sprite',
   standalone: true,
-  template: ` <canvas #canvas></canvas> `,
+  template: `<canvas #canvas></canvas>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
@@ -33,6 +33,7 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   private ctx!: CanvasRenderingContext2D;
   private width!: number;
   private height!: number;
+  private originalAspectRatio!: number;
   private subscription!: Subscription;
   private currentLoopIndex = 0;
   private currentAnimationType!: string;
@@ -56,6 +57,8 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
 
       this.img.src = this.imgSrc();
       this.img.onload = () => {
+        this.originalAspectRatio =
+          this.img.naturalWidth / this.img.naturalHeight;
         this.calculateDimensions();
         const autoPlay = this.autoPlayAnimation();
         if (autoPlay) {
@@ -66,9 +69,22 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   }
 
   private calculateDimensions(): void {
+    const [frameHeight, frameWidth] = [this.frameHeight(), this.frameWidth()];
     if (this.img.complete) {
-      this.width = this.frameWidth() ?? this.img.naturalWidth / this.columns();
-      this.height = this.frameHeight() ?? this.img.naturalHeight / this.rows();
+      if (frameWidth && !frameHeight) {
+        this.width = frameWidth;
+        this.height = this.width / this.originalAspectRatio; // Calculate height based on aspect ratio
+      } else if (!frameWidth && frameHeight) {
+        this.height = frameHeight;
+        this.width = this.height * this.originalAspectRatio; // Calculate width based on aspect ratio
+      } else if (frameWidth && frameHeight) {
+        this.width = frameWidth;
+        this.height = frameHeight;
+      } else {
+        this.width = this.img.naturalWidth / this.columns();
+        this.height = this.img.naturalHeight / this.rows();
+      }
+
       const canvas = this.canvasRef()?.nativeElement;
       if (canvas) {
         canvas.width = this.width;
@@ -138,12 +154,14 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   private drawFrame(frameIndex: number): void {
     const frameX = frameIndex % this.columns();
     const frameY = Math.floor(frameIndex / this.columns());
+    const naturalFrameWidth = this.img.naturalWidth / this.columns();
+    const naturalFrameHeight = this.img.naturalHeight / this.rows();
     this.ctx.drawImage(
       this.img,
-      frameX * this.width,
-      frameY * this.height,
-      this.width,
-      this.height,
+      frameX * naturalFrameWidth,
+      frameY * naturalFrameHeight,
+      naturalFrameWidth,
+      naturalFrameHeight,
       0,
       0,
       this.width,

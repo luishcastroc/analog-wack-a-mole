@@ -4,37 +4,16 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'game-score',
   standalone: true,
   template: `<img
+      class="absolute left-0 z-[2] h-12 w-12"
       src="/img/icon_score.png"
       alt="Score icon, a tiny golden coin" />
-    <div class="score-container">{{ score() }}</div>`,
+    <div
+      class="absolute left-[20px] right-[5px] flex h-6 max-w-[8rem] items-center justify-center rounded-[13px] bg-white">
+      {{ score() }}
+    </div>`,
   styles: `
     :host {
-      position: relative;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    img {
-      position: absolute;
-      left: 0;
-      width: 3rem;
-      height: 3rem;
-      z-index: 2;
-    }
-
-    .score-container {
-      height: 1.5rem;
-      position: absolute;
-      left: 20px;
-      right: 5px;
-      background-color: white;
-      border-radius: 13px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      max-width: 8rem;
+      @apply relative flex flex-1 items-center justify-center;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -14,7 +14,7 @@ import { timer } from 'rxjs';
   imports: [RouterLink, AnimatedSpriteComponent],
   template: `<div class="container flex flex-col items-center">
     <div
-      class="background-image flex flex-col items-center justify-center gap-5">
+      class="flex h-[100dvh] w-[650px] flex-col items-center justify-center gap-5 bg-[url('/img/background.png')] bg-cover">
       <span class="text-shadow text-6xl">Wack-A-Mole</span>
       <game-animated-sprite
         [animations]="animations"
@@ -36,15 +36,7 @@ import { timer } from 'rxjs';
   </div>`,
   styles: `
     :host {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .background-image {
-      background: url('/img/background.png');
-      width: 650px;
-      height: 100dvh;
+      @apply flex flex-col items-center;
     }
 
     .text-shadow {

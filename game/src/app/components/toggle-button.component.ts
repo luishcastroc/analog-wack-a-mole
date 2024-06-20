@@ -5,26 +5,14 @@ import { CommonModule } from '@angular/common';
   selector: 'game-toggle-button',
   standalone: true,
   imports: [CommonModule],
-  template: ` <button type="button">
-    <img [src]="imgSource" alt="Pause icon, two vertical white bars" />
+  template: ` <button
+    type="button"
+    class="flex h-12 w-12 flex-col items-center justify-center rounded-[10px] border-[solid_3px_white] bg-black">
+    <img
+      [src]="imgSource"
+      alt="Pause icon, two vertical white bars"
+      class="w-[1.3rem]" />
   </button>`,
-  styles: `
-    button {
-      width: 3rem;
-      height: 3rem;
-      background-color: black;
-      border: solid 3px white;
-      border-radius: 10px;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      display: flex;
-    }
-
-    img {
-      width: 1.3rem;
-    }
-  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToggleButtonComponent {

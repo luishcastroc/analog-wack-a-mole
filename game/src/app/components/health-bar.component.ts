@@ -5,42 +5,18 @@ import { CommonModule } from '@angular/common';
   selector: 'game-health-bar',
   standalone: true,
   imports: [CommonModule],
-  template: `<div class="health-bar">
-      <div class="health-bar-inner" [style.width.%]="health()"></div>
+  template: `<div class="ml-[4px] mt-[1px] h-6 w-full rounded-[10px] bg-white">
+      <div
+        class="absolute ml-[4px] h-6 rounded-[10px] bg-[#ff1a1a]"
+        [style.width.%]="health()"></div>
     </div>
     <img
       src="/img/icon_health.png"
       alt="Health icon, a red hearth"
-      class="health-icon" /> `,
+      class="absolute left-0 top-[-7px] h-10 w-12" /> `,
   styles: `
     :host {
-      position: relative;
-      flex: 1;
-    }
-
-    .health-icon {
-      position: absolute;
-      top: -7px;
-      left: 0;
-      width: 3rem;
-      height: 2.5rem;
-    }
-
-    .health-bar {
-      height: 1.5rem;
-      width: 100%;
-      margin-left: 4px;
-      margin-top: 1px;
-      background-color: white;
-      border-radius: 10px;
-    }
-
-    .health-bar-inner {
-      position: absolute;
-      margin-left: 4px;
-      background-color: #ff1a1a;
-      border-radius: 10px;
-      height: 1.5rem;
+      @apply relative flex-1;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

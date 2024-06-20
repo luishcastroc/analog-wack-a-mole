@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  inject,
   OnDestroy,
   signal,
   viewChildren,
@@ -16,6 +17,7 @@ import { HealthBarComponent } from './health-bar.component';
 import { ClearLevelComponent } from './clear-level.component';
 import { GameOverComponent } from './game-over.component';
 import { PauseComponent } from './pause.component';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 const DEFAULT_TIME = 30;
 interface GameState {
@@ -53,26 +55,30 @@ const DEFAULT_STATE: GameState = {
     PauseComponent,
   ],
   template: `<div class="container flex h-[100dvh] flex-col items-center">
-    <div class="background-image flex w-full flex-1 flex-col md:w-[650px]">
-      <div class="header">
-        <div class="stats">
+    <div
+      class="flex w-full flex-1 flex-col bg-[url('/img/background.png')] bg-cover bg-no-repeat md:w-[650px]">
+      <div
+        class="flex basis-[200px] flex-col content-center gap-4 px-6 pb-2 pt-12">
+        <div class="flex flex-row items-center gap-[4px] md:gap-6">
           <game-level [level]="state().level" />
           <game-timer [time]="state().time" />
           <game-score [score]="state().score" />
           <game-toggle-button (click)="state().paused ? resume() : pause()" />
         </div>
-        <div class="health-container">
+        <div class="flex flex-row items-center justify-center">
           <game-health-bar [health]="state().health" />
         </div>
       </div>
-      <div class="moles-container">
+      <div
+        class="relative grid cursor-[url('/img/hammer.png'),_auto] grid-cols-[repeat(3,_minmax(140px,_1fr))] items-center justify-items-center gap-4 px-4 py-0">
         @for (mole of moles(); track $index) {
           <game-mole
             #moleComponent
             (finishPopping)="onFinishPopping()"
             (damageReceived)="onDamage()"
             (moleHealing)="onHeal()"
-            (takeScore)="onScore()" />
+            (takeScore)="onScore()"
+            [frameWidth]="moleWidth()" />
         }
       </div>
     </div>
@@ -95,48 +101,7 @@ const DEFAULT_STATE: GameState = {
   </div>`,
   styles: `
     :host {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .background-image {
-      background: url('/img/background.png');
-    }
-
-    .header {
-      flex-basis: 25%;
-      flex-shrink: 0;
-      padding: 4rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 1rem;
-    }
-
-    .stats {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    .health-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .moles-container {
-      cursor: url('/img/hammer.png'), auto;
-      position: relative;
-      display: grid;
-      gap: 1rem;
-      padding: 0 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(143px, 1fr));
-      align-items: center;
-      justify-items: center;
+      @apply flex flex-col items-center;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -146,9 +111,25 @@ export class GameContainerComponent implements AfterViewInit, OnDestroy {
   private moleIntervalSubscription!: Subscription;
   private timerIntervalSubscription!: Subscription;
   moleQty = 12;
+  moleWidth = signal(0);
   moles = signal<Array<number>>(Array.from({ length: this.moleQty }));
   molesPopping = 0;
   state = signal<GameState>({ ...DEFAULT_STATE });
+  #responsive = inject(BreakpointObserver);
+
+  constructor() {
+    this.#responsive.observe([Breakpoints.Handset]).subscribe({
+      next: result => {
+        if (result.matches) {
+          this.moleWidth.set(110);
+        } else {
+          this.moleWidth.set(0);
+        }
+
+        console.log({ result });
+      },
+    });
+  }
 
   ngAfterViewInit() {
     this.setupTicks();

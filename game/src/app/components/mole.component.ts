@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  input,
   output,
   viewChild,
 } from '@angular/core';
@@ -18,7 +19,8 @@ import { timer } from 'rxjs';
     [columns]="6"
     [rows]="8"
     [imgSrc]="'/img/sprites.png'"
-    [autoPlayAnimation]="'idle'" />`,
+    [autoPlayAnimation]="'idle'"
+    [frameWidth]="frameWidth()" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoleComponent {
@@ -27,6 +29,7 @@ export class MoleComponent {
   damage = output({ alias: 'damageReceived' });
   score = output({ alias: 'takeScore' });
   heal = output({ alias: 'moleHealing' });
+  frameWidth = input(0);
 
   animations = {
     idle: [0],
