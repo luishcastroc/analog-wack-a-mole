@@ -4,10 +4,12 @@ import { ChangeDetectionStrategy, Component, output } from '@angular/core';
   selector: 'game-pause',
   standalone: true,
   template: `<div class="clear-screen">
-    <div class="panel">
-      <span class="panel-title text-center">Game Paused, Ready?</span>
+    <div class="panel relative">
+      <span class="panel-title text-center text-[2.5rem] md:text-[3.5rem]"
+        >Game Paused, Ready?</span
+      >
 
-      <div class="panel-buttons-container bottom-[20rem]">
+      <div class="panel-buttons-container bottom-[-2rem]">
         <div class="panel-button" (click)="reset.emit()">
           <img
             class="panel-button-icon"
