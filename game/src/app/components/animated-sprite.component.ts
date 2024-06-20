@@ -27,7 +27,7 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
   loopMode = input(false);
   frameWidth = input<number | null>(null);
   frameHeight = input<number | null>(null);
-  autoPlayAnimation = input('');
+  initialFrame = input<number>(0);
 
   private img = new Image();
   private ctx!: CanvasRenderingContext2D;
@@ -60,10 +60,7 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
         this.originalAspectRatio =
           this.img.naturalWidth / this.img.naturalHeight;
         this.calculateDimensions();
-        const autoPlay = this.autoPlayAnimation();
-        if (autoPlay) {
-          this.play(autoPlay);
-        }
+        this.drawFrame(this.initialFrame());
       };
     }
   }
@@ -73,10 +70,10 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
     if (this.img.complete) {
       if (frameWidth && !frameHeight) {
         this.width = frameWidth;
-        this.height = this.width / this.originalAspectRatio; // Calculate height based on aspect ratio
+        this.height = this.width / this.originalAspectRatio;
       } else if (!frameWidth && frameHeight) {
         this.height = frameHeight;
-        this.width = this.height * this.originalAspectRatio; // Calculate width based on aspect ratio
+        this.width = this.height * this.originalAspectRatio;
       } else if (frameWidth && frameHeight) {
         this.width = frameWidth;
         this.height = frameHeight;
@@ -159,7 +156,6 @@ export class AnimatedSpriteComponent implements AfterViewInit, OnDestroy {
     );
     const naturalFrameHeight = Math.floor(this.img.naturalHeight / this.rows());
 
-    // Add a small padding (1px) to avoid black lines
     const padding = 1;
 
     this.ctx.drawImage(

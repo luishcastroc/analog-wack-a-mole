@@ -19,7 +19,7 @@ import { timer } from 'rxjs';
     [columns]="6"
     [rows]="8"
     [imgSrc]="'/img/sprites.png'"
-    [autoPlayAnimation]="'idle'"
+    [initialFrame]="0"
     [frameWidth]="frameWidth()" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
